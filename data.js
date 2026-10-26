@@ -239,7 +239,7 @@ window.QUIZZES = {
       { q: "What should you do before every big change?", a: ["Export the video", "Duplicate the timeline as a backup", "Start a new project", "Clear the cache"], c: 1, why: "A backup timeline lets you always go back." },
       { q: "Which review step comes last before posting?", a: ["Watch it once on a phone", "Re-render everything", "Add more boxes", "Change the font"], c: 0, why: "Most viewers watch on a phone, so check it there." },
       { q: "Captions land seconds early. What was the likely mistake?", a: ["Wrong font", "Trusting timestamps typed into a lyric document", "Too many boxes", "Exporting at 30 fps"], c: 1, why: "Use word timings from a transcript, not typed timestamps." },
-      { q: "How do you make your second video take half the time?", a: ["Skip the storyboard", "Save the recipe as a reusable skill or template project", "Use fewer images", "Skip the review"], c: 1, why: "Your second video then starts at Chapter 04 with half the work done." }
+      { q: "How do you make your second video take half the time?", a: ["Skip the storyboard", "Save the recipe as a reusable skill or template project", "Use fewer images", "Skip the review"], c: 1, why: "Your second video then starts at Prep the Song with half the work done." }
     ]
   },
   final: {
