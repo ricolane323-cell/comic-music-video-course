@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="quiz">
+<div class="wrap">
+  <header>
+    <div class="kicker" id="kicker">Knowledge check</div>
+    <h1 id="title">Quiz</h1>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+  </header>
+  <main id="main"></main>
+</div>
+<script src="data.js"></script>
+<script>
+(function () {
+  var key = new URLSearchParams(location.search).get('q') || 'm1';
+  var quiz = (window.QUIZZES || {})[key];
+  var main = document.getElementById('main');
+  if (!quiz) { document.getElementById('title').textContent = 'Quiz not found'; return; }
+  document.getElementById('title').textContent = quiz.title;
+  var i, score, answers;
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function progress() {
+    document.getElementById('fill').style.width = (100 * i / quiz.questions.length) + '%';
+  }
+  function start() { i = 0; score = 0; answers = []; ask(); }
+
+  function ask() {
+    progress();
+    var item = quiz.questions[i];
+    main.innerHTML = '';
+    document.getElementById('kicker').textContent = 'Question ' + (i + 1) + ' of ' + quiz.questions.length;
+    main.appendChild(el('p', 'question', item.q));
+    var list = el('div', 'options');
+    var fb = el('div', 'feedback');
+    var next = el('button', 'cta', i === quiz.questions.length - 1 ? 'See my score' : 'Next question');
+    next.hidden = true;
+    item.a.forEach(function (text, n) {
+      var b = el('button', 'option');
+      b.appendChild(el('span', 'letter', 'ABCD'[n]));
+      b.appendChild(el('span', '', text));
+      b.onclick = function () {
+        [].forEach.call(list.children, function (o) { o.disabled = true; });
+        var right = n === item.c;
+        if (right) score++;
+        answers.push(right);
+        b.classList.add(right ? 'right' : 'wrong');
+        list.children[item.c].classList.add('right');
+        fb.className = 'feedback show ' + (right ? 'ok' : 'no');
+        fb.innerHTML = '';
+        fb.appendChild(el('strong', '', right ? 'POW! Correct.' : 'Not quite.'));
+        fb.appendChild(el('span', '', ' ' + item.why));
+        next.hidden = false;
+        next.focus();
+      };
+      list.appendChild(b);
+    });
+    next.onclick = function () { i++; i < quiz.questions.length ? ask() : finish(); };
+    main.appendChild(list);
+    main.appendChild(fb);
+    main.appendChild(next);
+  }
+
+  function finish() {
+    progress();
+    var pct = Math.round(100 * score / quiz.questions.length);
+    var passed = pct >= quiz.pass;
+    document.getElementById('kicker').textContent = 'Your result';
+    main.innerHTML = '';
+    var box = el('div', 'result ' + (passed ? 'pass' : 'fail'));
+    box.appendChild(el('div', 'burst', passed ? 'KA-POW!' : 'ALMOST!'));
+    box.appendChild(el('div', 'score', score + ' / ' + quiz.questions.length + '  (' + pct + '%)'));
+    box.appendChild(el('p', '', passed
+      ? 'You passed. Mark this lesson complete and move on to the next module.'
+      : 'You need ' + quiz.pass + '% to pass. Review the lessons in this module, then try again.'));
+    main.appendChild(box);
+    var again = el('button', 'cta ghost', 'Retake the quiz');
+    again.onclick = start;
+    main.appendChild(again);
+  }
+  start();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flip Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="flip">
+<div class="wrap">
+  <header>
+    <div class="kicker">Flip cards</div>
+    <h1 id="title">Review</h1>
+    <div class="count" id="count"></div>
+  </header>
+  <div class="stage">
+    <button class="card" id="card" aria-live="polite" aria-label="Flip card">
+      <div class="inner">
+        <div class="face front"><span class="tag">Question</span><p id="front"></p><span class="hint">Tap to flip</span></div>
+        <div class="face back"><span class="tag">Answer</span><p id="back"></p></div>
+      </div>
+    </button>
+  </div>
+  <nav>
+    <button class="nav" id="prev" aria-label="Previous card">&larr; Prev</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" aria-label="Next card">Next &rarr;</button>
+  </nav>
+</div>
+<script src="data.js"></script>
+<script>
+(function () {
+  var key = new URLSearchParams(location.search).get('d') || 'welcome';
+  var deck = (window.DECKS || {})[key];
+  if (!deck) { document.getElementById('title').textContent = 'Deck not found'; return; }
+  var i = 0, seen = {};
+  var card = document.getElementById('card');
+  document.getElementById('title').textContent = deck.title;
+  var dots = document.getElementById('dots');
+  deck.cards.forEach(function (_, n) {
+    var d = document.createElement('span'); d.className = 'dot'; dots.appendChild(d);
+  });
+  function show() {
+    card.classList.remove('flipped');
+    document.getElementById('front').textContent = deck.cards[i][0];
+    document.getElementById('back').textContent = deck.cards[i][1];
+    document.getElementById('count').textContent = 'Card ' + (i + 1) + ' of ' + deck.cards.length;
+    [].forEach.call(dots.children, function (d, n) {
+      d.className = 'dot' + (n === i ? ' on' : '') + (seen[n] ? ' seen' : '');
+    });
+    document.getElementById('prev').disabled = i === 0;
+    document.getElementById('next').textContent = i === deck.cards.length - 1 ? 'Start over ↺' : 'Next →';
+  }
+  card.addEventListener('click', function () {
+    card.classList.toggle('flipped'); seen[i] = true;
+    dots.children[i].classList.add('seen');
+  });
+  document.getElementById('prev').onclick = function () { if (i > 0) { i--; show(); } };
+  document.getElementById('next').onclick = function () { i = (i + 1) % deck.cards.length; show(); };
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') document.getElementById('next').click();
+    if (e.key === 'ArrowLeft') document.getElementById('prev').click();
+  });
+  show();
+})();
+</script>
+</body>
+</html>
