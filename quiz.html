@@ -36,11 +36,20 @@
   function progress() {
     document.getElementById('fill').style.width = (100 * i / quiz.questions.length) + '%';
   }
+  // Shuffle answer order on every attempt so the right answer isn't always in the same slot.
+  function shuffled(q) {
+    var order = q.a.map(function (_, n) { return n; });
+    for (var k = order.length - 1; k > 0; k--) {
+      var j = Math.floor(Math.random() * (k + 1));
+      var tmp = order[k]; order[k] = order[j]; order[j] = tmp;
+    }
+    return { q: q.q, why: q.why, a: order.map(function (n) { return q.a[n]; }), c: order.indexOf(q.c) };
+  }
   function start() { i = 0; score = 0; answers = []; ask(); }
 
   function ask() {
     progress();
-    var item = quiz.questions[i];
+    var item = shuffled(quiz.questions[i]);
     main.innerHTML = '';
     document.getElementById('kicker').textContent = 'Question ' + (i + 1) + ' of ' + quiz.questions.length;
     main.appendChild(el('p', 'question', item.q));
